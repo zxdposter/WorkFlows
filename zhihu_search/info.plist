@@ -3,22 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>com.alfredapp.zhihu</string>
+	<string>com.zxdposter.alfredapp.zhihu</string>
 	<key>connections</key>
 	<dict>
-		<key>0A07374E-5D22-4C13-8D76-C750AAEBEE99</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>F76DF33A-3F72-4BFF-9FFC-0043B8AFE4DD</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
 		<key>63F60794-BB56-4415-9372-BAF974C3A7E1</key>
 		<array>
 			<dict>
@@ -34,7 +21,7 @@
 		</array>
 	</dict>
 	<key>createdby</key>
-	<string>知乎</string>
+	<string>zxdposter</string>
 	<key>description</key>
 	<string>在知乎里搜索</string>
 	<key>disabled</key>
@@ -43,91 +30,6 @@
 	<string>知乎</string>
 	<key>objects</key>
 	<array>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>alfredfiltersresults</key>
-				<false/>
-				<key>argumenttype</key>
-				<integer>0</integer>
-				<key>escaping</key>
-				<integer>127</integer>
-				<key>keyword</key>
-				<string>zh</string>
-				<key>queuedelaycustom</key>
-				<integer>1</integer>
-				<key>queuedelayimmediatelyinitially</key>
-				<false/>
-				<key>queuedelaymode</key>
-				<integer>0</integer>
-				<key>queuemode</key>
-				<integer>1</integer>
-				<key>runningsubtext</key>
-				<string>正在努力搜索 {query} ...</string>
-				<key>script</key>
-				<string>require_once('workflows.php');
-$zh_url = "https://www.zhihu.com";
-$zl_zh_url = "https://zhuanlan.zhihu.com";
-$wf = new Workflows();
-
-$orig = "{query}";
-
-$data = $wf-&gt;request( "https://www.zhihu.com/autocomplete?token={query}&amp;max_matches=10&amp;use_similar=0" );
-$data = json_decode( $data );
-$data = $data[0];
-
-for( $i=1; $i&lt;count($data); $i++) {
-  $item = $data[$i];
-  $icon = null;
-
-  switch ($item[0]) {
-    case "question":
-      $link = "$zh_url/$item[0]/$item[3]";
-      break;
-    case "people":
-      $link = "$zh_url/$item[0]/$item[2]/answers";
-      break;
-    case "topic":
-      $link = "$zh_url/$item[0]/$item[2]/hot";
-      break;
-    case "column":
-      $link = "$zl_zh_url/$item[6]";
-      break;
-    case "article":
-      $link = "$zh_url/$item[3]";
-      break;
-    case "search_link":
-      $link = "$zh_url/search?q=$item[1]&amp;type=content";
-      break;
-  }
-
-  $icon = "appicons/$item[0].png";
-
-  $wf-&gt;result( $int++.'.'.time(), $link , $item[1], "[$item[0]] $item[1]", $icon );
-}
-
-echo $wf-&gt;toxml();
-</string>
-				<key>scriptargtype</key>
-				<integer>0</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>subtext</key>
-				<string>Search keywords in Zhihu</string>
-				<key>title</key>
-				<string>搜索话题、问题或人</string>
-				<key>type</key>
-				<integer>1</integer>
-				<key>withspace</key>
-				<true/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.scriptfilter</string>
-			<key>uid</key>
-			<string>63F60794-BB56-4415-9372-BAF974C3A7E1</string>
-			<key>version</key>
-			<integer>2</integer>
-		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -153,11 +55,11 @@ echo $wf-&gt;toxml();
 				<key>alfredfiltersresults</key>
 				<false/>
 				<key>argumenttype</key>
-				<integer>2</integer>
+				<integer>0</integer>
 				<key>escaping</key>
 				<integer>127</integer>
 				<key>keyword</key>
-				<string>zhd</string>
+				<string>zh</string>
 				<key>queuedelaycustom</key>
 				<integer>1</integer>
 				<key>queuedelayimmediatelyinitially</key>
@@ -167,41 +69,72 @@ echo $wf-&gt;toxml();
 				<key>queuemode</key>
 				<integer>1</integer>
 				<key>runningsubtext</key>
-				<string>正在努力获取数据中</string>
+				<string>正在努力搜索 {query} ...</string>
 				<key>script</key>
-				<string>require_once('workflows.php');
-$wf = new Workflows();
-$int = 1;
-$data = $wf-&gt;request( "http://news.at.zhihu.com/api/1.2/news/latest" );
-$data = json_decode( $data );
+				<string>#!/usr/bin/python
+# encoding: utf-8
 
-$date =  $data-&gt;date;
-$news = $data-&gt;news;
+import re
+import json
+from Workflow import Workflow
+import sys
+import urllib2
 
-for( $i=0; $i&lt;count($news); $i++) {
-  $item = $news[$i];
-  $icon = "icon.png";
-  $wf-&gt;result( $int++.'.'.time(), $item-&gt;share_url , $item-&gt;title, "", $icon );
-}
+reload(sys)
+sys.setdefaultencoding('utf8')
 
-echo $wf-&gt;toxml();</string>
+query = '{query}'
+query = urllib2.quote(query)
+url = 'https://www.zhihu.com/autocomplete?max_matches=10&amp;use_similar=0&amp;token=' + query
+zh_url = "https://www.zhihu.com"
+zl_zh_url = "https://zhuanlan.zhihu.com"
+
+wf = Workflow()
+
+result = wf.get_result_from_url(url)
+
+json_result = json.loads(result)
+json_result = json_result[0]
+
+for key in json_result:
+  result = key[0]
+  link = ''
+  if result == 'e':
+    continue
+  elif result == 'question':
+    link = '%s/%s/%s' % (zh_url, key[0], key[3])
+  elif result == 'people':
+    link = '%s/%s/%s/answers' % (zh_url, key[0], key[2])
+  elif result == 'topic':
+    link = '%s/%s/%s/hot' % (zh_url, key[0], key[2])
+  elif result == 'column':
+    link = '%s/%s' % (zl_zh_url, key[3])
+  elif result == 'article':
+    link = '%s/p/%s' % (zl_zh_url, key[3])
+  elif result == 'search_link':
+    link = '%s/search?q=%s&amp;type=content' % (zh_url, key[1])
+  icon = 'images/' + key[0] + '.png'
+  wf.add_item(key[1], subtitle=key[0], arg=link, icon=icon)
+
+print wf
+</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
 				<string></string>
 				<key>subtext</key>
-				<string>知乎日报</string>
+				<string>Search Zhihu for '{query}'</string>
 				<key>title</key>
-				<string>知乎日报</string>
+				<string>搜索话题、问题或人</string>
 				<key>type</key>
-				<integer>1</integer>
+				<integer>3</integer>
 				<key>withspace</key>
-				<false/>
+				<true/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.input.scriptfilter</string>
 			<key>uid</key>
-			<string>0A07374E-5D22-4C13-8D76-C750AAEBEE99</string>
+			<string>63F60794-BB56-4415-9372-BAF974C3A7E1</string>
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
@@ -210,19 +143,12 @@ echo $wf-&gt;toxml();</string>
 	<string></string>
 	<key>uidata</key>
 	<dict>
-		<key>0A07374E-5D22-4C13-8D76-C750AAEBEE99</key>
-		<dict>
-			<key>xpos</key>
-			<integer>300</integer>
-			<key>ypos</key>
-			<real>170</real>
-		</dict>
 		<key>63F60794-BB56-4415-9372-BAF974C3A7E1</key>
 		<dict>
 			<key>xpos</key>
-			<integer>300</integer>
+			<integer>290</integer>
 			<key>ypos</key>
-			<real>50</real>
+			<integer>100</integer>
 		</dict>
 		<key>F76DF33A-3F72-4BFF-9FFC-0043B8AFE4DD</key>
 		<dict>
@@ -233,6 +159,6 @@ echo $wf-&gt;toxml();</string>
 		</dict>
 	</dict>
 	<key>webaddress</key>
-	<string>www.zhihu.com</string>
+	<string>zxdposter@outlook.com</string>
 </dict>
 </plist>
